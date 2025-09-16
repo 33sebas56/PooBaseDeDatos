@@ -1,4 +1,4 @@
-package com.example.conexion_base_de_datos.model;
+package com.example.conexion_base_de_datos.infrastucture.model;
 
 public enum MetodoPago {
     EFECTIVO,

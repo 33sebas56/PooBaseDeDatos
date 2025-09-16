@@ -1,4 +1,4 @@
-package com.example.conexion_base_de_datos.model;
+package com.example.conexion_base_de_datos.infrastucture.model;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Id;
@@ -49,7 +49,6 @@ public class Venta {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    // Constructores
     public Venta() {}
 
     public Venta(BigDecimal subtotal, BigDecimal total, Vendedor vendedor, Cliente cliente) {

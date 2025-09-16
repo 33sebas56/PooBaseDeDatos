@@ -1,12 +1,14 @@
-package com.example.conexion_base_de_datos.model;
+package com.example.conexion_base_de_datos.infrastucture.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Id;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "vendedores")
-public class Vendedor {
+@Table(name = "clientes")
+public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,34 +23,36 @@ public class Vendedor {
     @Column(nullable = false, unique = true, length = 20)
     private String documento;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, length = 100)
     private String email;
 
     @Column(length = 15)
     private String telefono;
 
-    @Column(name = "fecha_ingreso")
-    private LocalDateTime fechaIngreso;
+    @Column(length = 255)
+    private String direccion;
 
-    @Column(name = "comision_porcentaje")
-    private Double comisionPorcentaje;
+    @Column(length = 100)
+    private String ciudad;
+
+    @Column(name = "fecha_registro")
+    private LocalDateTime fechaRegistro;
 
     private Boolean activo = true;
 
-    @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Venta> ventas;
 
     // Constructores
-    public Vendedor() {}
+    public Cliente() {}
 
-    public Vendedor(String nombre, String apellido, String documento, String email) {
+    public Cliente(String nombre, String apellido, String documento, String email) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.documento = documento;
         this.email = email;
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -97,20 +101,28 @@ public class Vendedor {
         this.telefono = telefono;
     }
 
-    public LocalDateTime getFechaIngreso() {
-        return fechaIngreso;
+    public String getDireccion() {
+        return direccion;
     }
 
-    public void setFechaIngreso(LocalDateTime fechaIngreso) {
-        this.fechaIngreso = fechaIngreso;
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 
-    public Double getComisionPorcentaje() {
-        return comisionPorcentaje;
+    public String getCiudad() {
+        return ciudad;
     }
 
-    public void setComisionPorcentaje(Double comisionPorcentaje) {
-        this.comisionPorcentaje = comisionPorcentaje;
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    public LocalDateTime getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
 
     public Boolean getActivo() {
@@ -120,7 +132,6 @@ public class Vendedor {
     public void setActivo(Boolean activo) {
         this.activo = activo;
     }
-
     public List<Venta> getVentas() {
         return ventas;
     }
@@ -131,6 +142,6 @@ public class Vendedor {
 
     @PrePersist
     protected void onCreate() {
-        fechaIngreso = LocalDateTime.now();
+        fechaRegistro = LocalDateTime.now();
     }
 }
