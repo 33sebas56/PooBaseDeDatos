@@ -2,9 +2,8 @@ package com.example.conexion_base_de_datos.application.service;
 
 import com.example.conexion_base_de_datos.application.dto.ClienteDTO;
 import com.example.conexion_base_de_datos.application.mapper.ClienteMapper;
+import com.example.conexion_base_de_datos.application.port.ClientePort;
 import com.example.conexion_base_de_datos.infrastucture.model.Cliente;
-import com.example.conexion_base_de_datos.infrastucture.repository.ClienteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,77 +14,79 @@ import java.util.Optional;
 @Transactional
 public class ClienteService {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    private final ClientePort clientePort;
+    private final ClienteMapper clienteMapper;
 
-    @Autowired
-    private ClienteMapper clienteMapper;
+    public ClienteService(ClientePort clientePort, ClienteMapper clienteMapper) {
+        this.clientePort = clientePort;
+        this.clienteMapper = clienteMapper;
+    }
 
     public List<ClienteDTO> getAllClientes() {
-        List<Cliente> clientes = clienteRepository.findAll();
+        List<Cliente> clientes = clientePort.findAll();
         return clienteMapper.toDTOList(clientes);
     }
 
     public Optional<ClienteDTO> getClienteById(Long id) {
-        return clienteRepository.findById(id)
+        return clientePort.findById(id)
                 .map(clienteMapper::toDTO);
     }
 
     public ClienteDTO createCliente(ClienteDTO clienteDTO) {
-        if (clienteRepository.existsByDocumento(clienteDTO.getDocumento())) {
+        if (clientePort.existsByDocumento(clienteDTO.getDocumento())) {
             throw new IllegalArgumentException("Ya existe un cliente con el documento: " + clienteDTO.getDocumento());
         }
-        if (clienteRepository.existsByEmail(clienteDTO.getEmail())) {
+        if (clientePort.existsByEmail(clienteDTO.getEmail())) {
             throw new IllegalArgumentException("Ya existe un cliente con el email: " + clienteDTO.getEmail());
         }
 
         Cliente cliente = clienteMapper.toEntity(clienteDTO);
-        Cliente savedCliente = clienteRepository.save(cliente);
+        Cliente savedCliente = clientePort.save(cliente);
         return clienteMapper.toDTO(savedCliente);
     }
 
     public Optional<ClienteDTO> updateCliente(Long id, ClienteDTO clienteDTO) {
-        return clienteRepository.findById(id)
+        return clientePort.findById(id)
                 .map(cliente -> {
                     clienteMapper.updateEntityFromDTO(clienteDTO, cliente);
-                    Cliente updatedCliente = clienteRepository.save(cliente);
+                    Cliente updatedCliente = clientePort.save(cliente);
                     return clienteMapper.toDTO(updatedCliente);
                 });
     }
 
     public boolean deleteCliente(Long id) {
-        return clienteRepository.findById(id)
+        return clientePort.findById(id)
                 .map(cliente -> {
                     cliente.setActivo(false);
-                    clienteRepository.save(cliente);
+                    clientePort.save(cliente);
                     return true;
                 })
                 .orElse(false);
     }
 
     public List<ClienteDTO> getClientesActivos() {
-        List<Cliente> clientes = clienteRepository.findByActivoTrue();
+        List<Cliente> clientes = clientePort.findByActivoTrue();
         return clienteMapper.toDTOList(clientes);
     }
 
     public Optional<ClienteDTO> getClienteByDocumento(String documento) {
-        return clienteRepository.findByDocumento(documento)
+        return clientePort.findByDocumento(documento)
                 .map(clienteMapper::toDTO);
     }
 
     public List<ClienteDTO> buscarClientes(String nombre) {
-        List<Cliente> clientes = clienteRepository
+        List<Cliente> clientes = clientePort
                 .findByNombreContainingIgnoreCaseOrApellidoContainingIgnoreCase(nombre, nombre);
         return clienteMapper.toDTOList(clientes);
     }
 
     public List<ClienteDTO> getClientesPorCiudad(String ciudad) {
-        List<Cliente> clientes = clienteRepository.findByCiudadContainingIgnoreCase(ciudad);
+        List<Cliente> clientes = clientePort.findByCiudadContainingIgnoreCase(ciudad);
         return clienteMapper.toDTOList(clientes);
     }
 
     public List<ClienteDTO> getClientesConVentas() {
-        List<Cliente> clientes = clienteRepository.findClientesConVentas();
+        List<Cliente> clientes = clientePort.findClientesConVentas();
         return clienteMapper.toDTOList(clientes);
     }
 }
